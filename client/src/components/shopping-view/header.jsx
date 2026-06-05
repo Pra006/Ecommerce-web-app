@@ -84,7 +84,12 @@ const HeaderRightContent = ({ user }) => {
           <ShoppingCart className="h-5 w-5" />
           <span className="sr-only">User cart</span>
         </Button>
-        <UserCartWrapper cartItems={Array.isArray(cartItems) && cartItems.length > 0 ? cartItems : []} />
+        <UserCartWrapper
+        setOpenCart={setOpenCart}
+          cartItems={
+            Array.isArray(cartItems) && cartItems.length > 0 ? cartItems : []
+          }
+        />
       </Sheet>
 
       <DropdownMenu>

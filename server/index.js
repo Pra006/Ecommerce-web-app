@@ -7,7 +7,7 @@ import authrouter from './routes/auth/auth-routes.js'
 import adminProductRouter from './routes/admin/products-routes.js'
 import shopProductRouter from './routes/shop/products-route.js'
 import shopCartRouter from "./routes/shop/cart-routes.js"
-import shopAddressRouter from "./routes/shop/cart-routes.js"
+import shopAddressRouter from "./routes/shop/address-routes.js"
 
 
 dotenv.config()
