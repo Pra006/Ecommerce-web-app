@@ -1,11 +1,12 @@
 import React from 'react'
+import AdminOrdersView from '../../components/admin-view/orders'
 
-const AdminOrders = () => {
+const AdminOrdersview = () => {
   return (
     <div>
-      <h2>Admin Orders</h2>
+    <AdminOrdersView />
     </div>
   )
 }
 
-export default AdminOrders
+export default AdminOrdersView

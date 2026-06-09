@@ -71,7 +71,6 @@ const HeaderRightContent = ({ user }) => {
       dispatch(fetchCartItems({ userId: user.id }));
     }
   }, [dispatch, user?.id]);
-  console.log(cartItems);
   return (
     <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
       <Sheet open={openCart} onOpenChange={(open) => setOpenCart(open)}>

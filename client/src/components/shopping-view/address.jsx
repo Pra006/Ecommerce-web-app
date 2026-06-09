@@ -22,7 +22,7 @@ const initialFormData = {
   notes: "",
 };
 
-const Address = () => {
+const Address = ({ currentSelectedAddress, setCurrentSelectedAddress }) => {
   const [formData, setFormData] = useState(initialFormData);
   const [currentEditAddressId, setCurrentEditAddressId] = useState(null);
   const { user } = useSelector((state) => state.auth);
@@ -35,6 +35,16 @@ const Address = () => {
       dispatch(fetchAllAddress(userId));
     }
   }, [user, dispatch]);
+
+  useEffect(() => {
+    if (
+      !currentSelectedAddress &&
+      addressList &&
+      addressList.length > 0
+    ) {
+      setCurrentSelectedAddress(addressList[0]);
+    }
+  }, [addressList, currentSelectedAddress, setCurrentSelectedAddress]);
 
   const handleAddress = (e) => {
     e.preventDefault();
@@ -116,6 +126,7 @@ if (addressList && addressList.length >=3) {
         {addressList && addressList.length > 0 ? (
           addressList.map((addressInfo) => (
             <AddressCard
+              setCurrentSelectedAddress={setCurrentSelectedAddress}
               handleDeleteAddress={handleDeleteAddress}
               handleEditAddress={handleEditAddress}
               key={addressInfo._id}

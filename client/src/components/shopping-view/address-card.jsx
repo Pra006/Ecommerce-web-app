@@ -1,26 +1,36 @@
-import React from 'react'
-import { Card, CardContent, CardFooter } from '../ui/card'
-import { Label } from '../ui/label'
-import { Button } from '../ui/button'
+import React from "react";
+import { Card, CardContent, CardFooter } from "../ui/card";
+import { Label } from "../ui/label";
+import { Button } from "../ui/button";
 
-const AddressCard = ({addressInfo, handleDeleteAddress, handleEditAddress}) => {
-
-
+const AddressCard = ({
+  addressInfo,
+  handleDeleteAddress,
+  handleEditAddress,
+  setCurrentSelectedAddress,
+}) => {
   return (
-   <Card>
-    <CardContent className='space-y-2 p-4'>
+    <Card
+      onClick={
+        setCurrentSelectedAddress
+          ? () => setCurrentSelectedAddress(addressInfo)
+          : null
+      }
+      className="cursor-pointer hover:bg-gray-100"
+    >
+      <CardContent className="space-y-2 p-4">
         <Label>Address :{addressInfo?.address}</Label>
         <Label>City :{addressInfo?.city}</Label>
         <Label>Pincode:{addressInfo?.pincode}</Label>
         <Label>Phone-No :{addressInfo?.phone}</Label>
         <Label>Notes:{addressInfo?.notes}</Label>
-    </CardContent>
-    <CardFooter className='flex justify-between gap-2 p-4'>
-        <Button onClick={() => handleEditAddress(addressInfo)}>Edit</Button>
-        <Button onClick={() => handleDeleteAddress(addressInfo)}>Delete</Button>
-    </CardFooter>
-   </Card>
-  )
-}
+      </CardContent>
+      <CardFooter className="flex justify-between gap-2 p-4">
+        <Button onClick={(e) => { e.stopPropagation(); handleEditAddress(addressInfo); }}>Edit</Button>
+        <Button onClick={(e) => { e.stopPropagation(); handleDeleteAddress(addressInfo); }}>Delete</Button>
+      </CardFooter>
+    </Card>
+  );
+};
 
-export default AddressCard
+export default AddressCard;

@@ -5,9 +5,9 @@ import {
   TabsList,
   TabsTrigger,
 } from "../../components/ui/tabs";
-import Orders from "../../components/shopping-view/orders";
 import Address from "../../components/shopping-view/address";
 import account3 from "../../assets/account3.jpg";
+import ShoppingOrders from "../../components/shopping-view/orders";
 
 const ShoppingAccount = () => {
   return (
@@ -27,7 +27,7 @@ const ShoppingAccount = () => {
               <TabsTrigger value="address" className="text-lg font-bold">Address</TabsTrigger>
             </TabsList>
             <TabsContent value="orders">
-              <Orders />
+              <ShoppingOrders />
             </TabsContent>
             <TabsContent value="address">
               <Address />

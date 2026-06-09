@@ -22,6 +22,7 @@ import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { checkAuth } from "./store/auth-slice";
 import { Skeleton } from "./components/ui/skeleton";
+import PaypalReturnPage from "./pages/shopping-view/paypal-return";
 
 
 const App = () => {
@@ -78,6 +79,7 @@ const App = () => {
         <Route path="listing" element={<ShoppingList />} />
         <Route path="checkout" element={<ShoppingCheckout />} />
         <Route path="account" element={<ShoppingAccount />} />
+        <Route path="paypal-return" element ={ <PaypalReturnPage />} />
         <Route path="*" element={<NotFound />} />
       </Route>
       <Route path="/unauth-page" element={<UnauthPage />} />
