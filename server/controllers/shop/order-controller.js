@@ -94,33 +94,75 @@ export const createOrder = async (req, res) => {
   }
 };
 
-export const CapturePayment = async (req, res) => {
+export const capturePayment = async (req, res) => {
   try {
-    const {paymentId, payerId, orderId } = req.body
-    let order = await Order.findById(orderId)
-    if(!order){
+    const { paymentId, payerId, orderId } = req.body;
+    let order = await Order.findById(orderId);
+    if (!order) {
       return res.status(404).json({
         success: false,
         message: "Order not found",
       });
     }
-   order.paymentStatus = "paid";
+    order.paymentStatus = "paid";
     order.paymentId = paymentId;
     order.orderStatus = "confirmed";
     order.payerId = payerId;
 
     const getCartId = order.cartId;
     await Cart.findByIdAndDelete(getCartId);
-    await order.save()
+    await order.save();
     res.status(200).json({
       success: true,
       message: "Payment captured successfully",
       data: order,
     });
-
-
   } catch (error) {
     console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Error occured!",
+    });
+  }
+};
+
+export const getAllOrderByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const orders = await Order.find({ userId });
+    if (!orders.length) {
+      return res.status(404).json({
+        success: false,
+        message: "No orders found for this user",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      data: orders,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error occured!",
+    });
+  }
+};
+
+export const getOrderDetails = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const order = await Order.findById(id);
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      data: order,
+    });
+  } catch (error) {
     res.status(500).json({
       success: false,
       message: "Error occured!",

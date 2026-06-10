@@ -7,6 +7,7 @@ import UserCartContent from "../../components/shopping-view/cart-content";
 import { Button } from "../../components/ui/button";
 import { useDispatch } from "react-redux";
 import { createNewOrder } from "../../store/shop/order-slice";
+import { toast } from "sonner";
 
 const ShoppingCheckout = () => {
   const { cartItems } = useSelector((state) => state.shopCart);
@@ -21,6 +22,16 @@ const ShoppingCheckout = () => {
   }, 0);
 
   const handleInitiatePaypalPayment = () => {
+    if(cartItems.length === 0){
+      toast.error("Your cart is empty. Please add items to your cart before proceeding to payment.");
+      return;
+    }
+
+    if(currentSelectedAddress === null){
+      toast.error("Please select an address before proceeding to payment.");
+      return;
+    }
+
     if (!userId) {
       console.error("Cannot create order: missing userId");
       return;

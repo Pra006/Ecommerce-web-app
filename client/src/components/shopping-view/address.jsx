@@ -42,7 +42,9 @@ const Address = ({ currentSelectedAddress, setCurrentSelectedAddress }) => {
       addressList &&
       addressList.length > 0
     ) {
-      setCurrentSelectedAddress(addressList[0]);
+      if (typeof setCurrentSelectedAddress === "function") {
+        setCurrentSelectedAddress(addressList[0]);
+      }
     }
   }, [addressList, currentSelectedAddress, setCurrentSelectedAddress]);
 
@@ -126,7 +128,9 @@ if (addressList && addressList.length >=3) {
         {addressList && addressList.length > 0 ? (
           addressList.map((addressInfo) => (
             <AddressCard
-              setCurrentSelectedAddress={setCurrentSelectedAddress}
+              {...(typeof setCurrentSelectedAddress === "function"
+                ? { setCurrentSelectedAddress }
+                : {})}
               handleDeleteAddress={handleDeleteAddress}
               handleEditAddress={handleEditAddress}
               key={addressInfo._id}
