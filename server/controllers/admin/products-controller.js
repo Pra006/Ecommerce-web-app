@@ -49,7 +49,7 @@ const addProduct = async (req, res) => {
       brand,
       price,
       salePrice,
-      totalStock,
+      totalStock: totalStock !== undefined && totalStock !== null && totalStock !== "" ? Number(totalStock) : 0,
     });
     await newlycreatedProduct.save();
     res.status(201).json({
@@ -109,12 +109,15 @@ const editProduct = async (req, res) => {
       });
     }
     findProduct.title = title || findProduct.title;
-    findProduct.description || findProduct.description;
+    findProduct.description = description || findProduct.description;
     findProduct.category = category || findProduct.category;
     findProduct.brand = brand || findProduct.brand;
     findProduct.price = price || findProduct.price;
     findProduct.salePrice = salePrice || findProduct.salePrice;
-    findProduct.totalStock = totalStock || findProduct.totalStock;
+    findProduct.totalStock =
+      totalStock !== undefined && totalStock !== null && totalStock !== ""
+        ? Number(totalStock)
+        : findProduct.totalStock;
     findProduct.image = image || findProduct.image;
 
     await findProduct.save();

@@ -11,7 +11,11 @@ import { Button } from "../../components/ui/button";
 import { ArrowDownUp } from "lucide-react";
 import { sortOptions } from "../../config";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllFilteredProducts, fetchProductDetails, clearProductDetails } from "../../store/shop/product-slice";
+import {
+  fetchAllFilteredProducts,
+  fetchProductDetails,
+  clearProductDetails,
+} from "../../store/shop/product-slice";
 import ShoppingProductTile from "../../components/shopping-view/product-tile";
 import { useSearchParams } from "react-router-dom";
 import ProductDetailsDialog from "../../components/shopping-view/prdouct-details";
@@ -20,22 +24,17 @@ import { toast } from "../../components/ui/index";
 
 const ShoppingList = () => {
   const dispatch = useDispatch();
-
   const { productList, productdetails } = useSelector(
-    (state) => state.shopProducts
+    (state) => state.shopProducts,
   );
-
   const { user } = useSelector((state) => state.auth);
-
   const [filter, setFilter] = useState({});
   const [sort, setSort] = useState("price-lowtohigh");
   const [searchParams, setSearchParams] = useSearchParams();
-
+  const categorySearchParam = searchParams.get("category");
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-
   const userId = user?.id || user?._id || user?.Id;
-
   const handleSorting = (value) => {
     setSort(value);
   };
@@ -92,7 +91,7 @@ const ShoppingList = () => {
         userId,
         productId,
         quantity: 1,
-      })
+      }),
     ).then((data) => {
       if (data?.payload?.success) {
         dispatch(fetchCartItems({ userId }));
@@ -104,7 +103,7 @@ const ShoppingList = () => {
   useEffect(() => {
     const savedFilters = sessionStorage.getItem("filters");
     setFilter(savedFilters ? JSON.parse(savedFilters) : {});
-  }, []);
+  }, [categorySearchParam]);
 
   useEffect(() => {
     if (filter && Object.keys(filter).length > 0) {
@@ -118,7 +117,7 @@ const ShoppingList = () => {
       fetchAllFilteredProducts({
         filterParams: filter,
         sortParams: sort,
-      })
+      }),
     );
   }, [dispatch, sort, filter]);
 
@@ -127,6 +126,7 @@ const ShoppingList = () => {
       setSelectedProduct(productdetails);
     }
   }, [productdetails]);
+console.log(productList)
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6">
@@ -150,7 +150,10 @@ const ShoppingList = () => {
               </DropdownMenuTrigger>
 
               <DropdownMenuContent align="end" className="w-[200px]">
-                <DropdownMenuRadioGroup value={sort} onValueChange={handleSorting}>
+                <DropdownMenuRadioGroup
+                  value={sort}
+                  onValueChange={handleSorting}
+                >
                   {sortOptions.map((item) => (
                     <DropdownMenuRadioItem key={item.id} value={item.id}>
                       {item.label}
@@ -183,7 +186,7 @@ const ShoppingList = () => {
 
           if (!val) {
             setSelectedProduct(null);
-            dispatch(clearProductDetails()); // ✅ cleanup on close
+            dispatch(clearProductDetails()); 
           }
         }}
         productdetails={selectedProduct}

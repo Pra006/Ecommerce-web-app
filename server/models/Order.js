@@ -29,4 +29,5 @@ const OrderSchema = new mongoose.Schema({
   paymentId: String,
   payerId: String,
 });
-export default mongoose.model("Order", OrderSchema);
+const OrderModel = mongoose.models.Order || mongoose.model("Order", OrderSchema);
+export default OrderModel;

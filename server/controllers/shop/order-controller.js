@@ -1,6 +1,7 @@
 import paypal from "../../helper/paypal.js";
 import Order from "../../models/Order.js";
 import Cart from "../../models/Cart.js";
+import Product from "../../models/Products.js";
 
 export const createOrder = async (req, res) => {
   try {
@@ -104,19 +105,81 @@ export const capturePayment = async (req, res) => {
         message: "Order not found",
       });
     }
-    order.paymentStatus = "paid";
-    order.paymentId = paymentId;
-    order.orderStatus = "confirmed";
-    order.payerId = payerId;
 
-    const getCartId = order.cartId;
-    await Cart.findByIdAndDelete(getCartId);
-    await order.save();
-    res.status(200).json({
-      success: true,
-      message: "Payment captured successfully",
-      data: order,
-    });
+    if (order.paymentStatus === "paid") {
+      return res.status(200).json({
+        success: true,
+        message: "Payment already captured",
+        data: order,
+      });
+    }
+
+    paypal.payment.execute(
+      paymentId,
+      { payer_id: payerId },
+      async (error, paymentInfo) => {
+        if (error) {
+          console.error("PayPal execute error:", error?.response || error);
+          return res.status(500).json({
+            success: false,
+            message: "Error while capturing paypal payment",
+            error: error?.response || error?.toString(),
+          });
+        }
+
+        if (!paymentInfo || paymentInfo.state !== "approved") {
+          return res.status(400).json({
+            success: false,
+            message: "PayPal payment was not approved",
+            data: paymentInfo,
+          });
+        }
+
+        order.paymentStatus = "paid";
+        order.paymentId = paymentId;
+        order.orderStatus = "confirmed";
+        order.payerId = payerId;
+
+        for (let item of order.cartItems) {
+          const product = await Product.findById(item.productId);
+
+          if (!product) {
+            return res.status(404).json({
+              success: false,
+              message: `Product not found: ${item.title || item.productId}`,
+            });
+          }
+
+          const quantity = Number(item.quantity ?? 1);
+          if (Number.isNaN(quantity) || quantity <= 0) {
+            return res.status(400).json({
+              success: false,
+              message: `Invalid quantity for product ${product.title}`,
+            });
+          }
+
+          if (product.totalStock < quantity) {
+            return res.status(400).json({
+              success: false,
+              message: `Not enough stock for this product ${product.title}`,
+            });
+          }
+
+          product.totalStock = product.totalStock - quantity;
+          await product.save();
+        }
+
+        const getCartId = order.cartId;
+        await Cart.findByIdAndDelete(getCartId);
+        await order.save();
+        res.status(200).json({
+          success: true,
+          message: "Payment captured successfully",
+          data: order,
+          paypalPayment: paymentInfo,
+        });
+      },
+    );
   } catch (error) {
     console.log(error);
     res.status(500).json({

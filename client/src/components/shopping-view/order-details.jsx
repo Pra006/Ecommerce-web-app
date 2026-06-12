@@ -6,7 +6,17 @@ import { Badge } from "../ui/badge";
 import { useSelector } from "react-redux";
 
 const ShoppingOrderDetailsView = ({ orderDetails }) => {
-  const {user} = useSelector(state => state.auth)
+  const { user } = useSelector((state) => state.auth);
+
+  const getStatusClass = (status) => {
+    const normalized = String(status ?? "").toLowerCase();
+    if (normalized === "delivered" || normalized === "confirmed") return "bg-green-500";
+    if (normalized === "rejected") return "bg-red-500";
+    if (normalized === "shipping" || normalized === "inprocess" || normalized === "in progress") return "bg-amber-500";
+    if (normalized === "pending") return "bg-yellow-400";
+    return "bg-black-500";
+  };
+
   return (
     <div>
       <DialogContent className="sm:max-w-[600px]">
@@ -24,7 +34,7 @@ const ShoppingOrderDetailsView = ({ orderDetails }) => {
               <p className="font-medium">Order Status</p>
               <Label>
                 <Badge
-                  className={`px-2 py-1 text-xs ${orderDetails?.orderStatus === "confirmed" ? "bg-green-500" : "bg-red-500"}`}
+                  className={`px-2 py-1 text-xs ${getStatusClass(orderDetails?.orderStatus)}`}
                 >
                   {orderDetails?.orderStatus || "—"}
                 </Badge>
@@ -64,7 +74,7 @@ const ShoppingOrderDetailsView = ({ orderDetails }) => {
             <div className="grid gap-3">
               <div className="flex item-center font-bold">Shipping Info</div>
               <div className="grid gap-1 text-muted-foreground">
-                <span>{user.userName}</span>
+                <span>{user?.userName || "—"}</span>
                 <span>{orderDetails?.addressInfo?.address || "—"}</span>
                 <span>{orderDetails?.addressInfo?.city || "—"}</span>
                 <span>{orderDetails?.addressInfo?.pincode || "—"}</span>

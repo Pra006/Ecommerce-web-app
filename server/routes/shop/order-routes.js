@@ -3,7 +3,7 @@ import { createOrder, capturePayment, getAllOrderByUserId, getOrderDetails} from
 const router = express.Router();
 
 router.post("/create", createOrder)
-router.post("capture",capturePayment )
+router.post("/capture",capturePayment )
 router.get("/list/:userId", getAllOrderByUserId)
 router.get("/details/:id", getOrderDetails)
 

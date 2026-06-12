@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import {
   HousePlug,
   Menu,
@@ -29,14 +29,21 @@ import { useState, useEffect } from "react";
 import { fetchCartItems } from "../../store/shop/cart-slice";
 import { Label } from "../ui/label";
 
+
 const MenuItem = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams()
 
   function handleNavigate(getCurrentItem) {
     sessionStorage.removeItem("filters");
     const currentfilters =
-      getCurrentItem.id !== "home" ? { category: [getCurrentItem.id] } : {};
+      getCurrentItem.id !== "home" && getCurrentItem.id !== "products"
+        ? { category: [getCurrentItem.id] }
+        : {};
     sessionStorage.setItem("filters", JSON.stringify(currentfilters));
+    location.pathname.includes('listing') && currentfilters !== null ?
+    setSearchParams(new URLSearchParams(`?category=${getCurrentItem.id}`)):
     navigate(getCurrentItem.path);
   }
 
@@ -84,7 +91,7 @@ const HeaderRightContent = ({ user }) => {
           <span className="sr-only">User cart</span>
         </Button>
         <UserCartWrapper
-        setOpenCart={setOpenCart}
+          setOpenCart={setOpenCart}
           cartItems={
             Array.isArray(cartItems) && cartItems.length > 0 ? cartItems : []
           }

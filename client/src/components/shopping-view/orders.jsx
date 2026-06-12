@@ -25,8 +25,17 @@ const ShoppingOrders = () => {
   const { user } = useSelector((state) => state.auth);
   const { orderList, orderDetails } = useSelector((state) => state.shopOrder);
 
+  const getStatusClass = (status) => {
+    const normalized = String(status ?? "").toLowerCase();
+    if (normalized === "delivered" || normalized === "confirmed") return "bg-green-500";
+    if (normalized === "rejected") return "bg-red-500";
+    if (normalized === "shipping" || normalized === "inprocess" || normalized === "in progress") return "bg-amber-500";
+    if (normalized === "pending") return "bg-yellow-400";
+    return "bg-black-500";
+  };
+
   const handleOrderDetails = (getId) => {
-    dispatch(getOrderDetails(getId)).then;
+    dispatch(getOrderDetails(getId));
   };
   useEffect(() => {
     if (orderDetails !== null) {
@@ -70,9 +79,9 @@ const ShoppingOrders = () => {
                     </TableCell>
                     <TableCell>
                       <Badge
-                        className={`px-2 py-1 text-xs ${orderItem.orderStatus === "confirmed" ? "bg-green-500" : "bg-red-500"}`}
+                        className={`px-2 py-1 text-xs ${getStatusClass(orderItem?.orderStatus)}`}
                       >
-                        {orderItem.orderStatus}
+                        {orderItem.orderStatus || "—"}
                       </Badge>
                     </TableCell>
                     <TableCell>${orderItem.totalAmount}</TableCell>

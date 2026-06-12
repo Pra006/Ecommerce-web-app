@@ -5,6 +5,7 @@ import axios from "axios";
 const initialState = {
     isLoading: false,
     cartItems: [],
+    cartId: null,
 }
 
 export const addToCart =  createAsyncThunk(
@@ -60,10 +61,12 @@ builder
 .addCase(addToCart.fulfilled, (state, action) => {
     state.isLoading = false;
     state.cartItems = action.payload.data.items;
+    state.cartId = action.payload.data._id;
 })
 .addCase(addToCart.rejected, (state, action) => {
     state.isLoading = true;
     state.cartItems = [];
+    state.cartId = null;
 })
 
 
@@ -73,10 +76,12 @@ builder
 .addCase(fetchCartItems.fulfilled, (state, action) => {
     state.isLoading = false;
     state.cartItems = action.payload.data.items;
+    state.cartId = action.payload.data._id;
 })
 .addCase(fetchCartItems.rejected, (state, action) => {
     state.isLoading = true;
     state.cartItems = [];
+    state.cartId = null;
 })
 
 
@@ -86,10 +91,12 @@ builder
 .addCase(updateCartItemQuantity.fulfilled, (state, action) => {
     state.isLoading = false;
     state.cartItems = action.payload.data.items;
+    state.cartId = action.payload.data._id;
 })
 .addCase(updateCartItemQuantity.rejected, (state, action) => {
     state.isLoading = true;
     state.cartItems = [];
+    state.cartId = null;
 })
 
 
@@ -99,10 +106,12 @@ builder
 .addCase(deleteCartItem.fulfilled, (state, action) => {
     state.isLoading = false;
     state.cartItems = action.payload.data.items;
+    state.cartId = action.payload.data._id;
 })
 .addCase(deleteCartItem.rejected, (state, action) => {
     state.isLoading = true;
     state.cartItems = [];   
+    state.cartId = null;
 })
 
     }});

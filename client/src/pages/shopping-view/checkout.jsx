@@ -10,7 +10,7 @@ import { createNewOrder } from "../../store/shop/order-slice";
 import { toast } from "sonner";
 
 const ShoppingCheckout = () => {
-  const { cartItems } = useSelector((state) => state.shopCart);
+  const { cartItems, cartId } = useSelector((state) => state.shopCart);
   const [currentSelectedAddress, setCurrentSelectedAddress] = useState(null);
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
@@ -43,7 +43,7 @@ const ShoppingCheckout = () => {
 
     const orderData = {
       userId,
-      cartId: cartItems?._id,
+      cartId,
       cartItems: cartItems.map((item) => ({
         productId: item?.productId,
         title: item?.title,

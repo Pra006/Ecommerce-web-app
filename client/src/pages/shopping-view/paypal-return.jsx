@@ -1,9 +1,10 @@
-import React, { useDebugValue } from "react";
+import React from "react";
 import { Card, CardHeader, CardTitle } from "../../components/ui/card";
 import { useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { capturePayment } from "../../store/shop/order-slice";
 import { useEffect } from "react";
+import { toast } from "sonner";
 
 const PaypalReturnPage = () => {
   const dispatch = useDispatch();
@@ -20,8 +21,12 @@ const PaypalReturnPage = () => {
         payerId,
         orderId: getCurrentOrderId
       })).then(data => {
-        sessionStorage.removeItem("currentOrderId");
-        window.location.href = "/shop/payment-success";
+        if (data?.payload?.success) {
+          sessionStorage.removeItem("currentOrderId");
+          window.location.href = "/shop/payment-success";
+        } else {
+          toast.error(data?.payload?.message || "Payment capture failed");
+        }
       })
     }
   }, [paymentId, payerId]);
