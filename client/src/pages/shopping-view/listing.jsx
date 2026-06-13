@@ -19,14 +19,16 @@ import {
 import ShoppingProductTile from "../../components/shopping-view/product-tile";
 import { useSearchParams } from "react-router-dom";
 import ProductDetailsDialog from "../../components/shopping-view/prdouct-details";
-import { addToCart, fetchCartItems } from "../../store/shop/cart-slice";
-import { toast } from "../../components/ui/index";
+import { addToCart, fetchCartItems, updateCartItemQuantity } from "../../store/shop/cart-slice";
+import { toast } from "sonner";
+
 
 const ShoppingList = () => {
   const dispatch = useDispatch();
   const { productList, productdetails } = useSelector(
     (state) => state.shopProducts,
   );
+  const { cartItems } = useSelector((state) => state.shopCart);
   const { user } = useSelector((state) => state.auth);
   const [filter, setFilter] = useState({});
   const [sort, setSort] = useState("price-lowtohigh");
@@ -85,7 +87,42 @@ const ShoppingList = () => {
     }
   }
 
-  function handleAddtoCart(productId) {
+  function handleAddtoCart(productId, getTotalStock) {
+    const currentCart = Array.isArray(cartItems) ? cartItems : [];
+
+    if (currentCart.length) {
+      const indexOfCurrentItem = currentCart.findIndex(
+        (item) => String(item.productId) === String(productId),
+      );
+
+      if (indexOfCurrentItem > -1) {
+        const currentQuantity = Number(currentCart[indexOfCurrentItem].quantity) || 0;
+
+        if (currentQuantity + 1 > Number(getTotalStock)) {
+          toast.error(`Only ${getTotalStock} items left in stock`);
+          return;
+        }
+
+        dispatch(
+          updateCartItemQuantity({
+            userId,
+            productId,
+            quantity: currentQuantity + 1,
+          }),
+        ).then((data) => {
+          if (data?.payload?.success) {
+            dispatch(fetchCartItems({ userId }));
+            toast.success("Cart quantity updated");
+          } else {
+            toast.error(data?.payload?.message || "Failed to update cart");
+          }
+        });
+
+        return;
+      }
+    }
+
+    // Item not in cart yet
     dispatch(
       addToCart({
         userId,
@@ -96,6 +133,8 @@ const ShoppingList = () => {
       if (data?.payload?.success) {
         dispatch(fetchCartItems({ userId }));
         toast.success("Product added to cart");
+      } else {
+        toast.error(data?.payload?.message || "Failed to add product to cart");
       }
     });
   }
@@ -126,7 +165,6 @@ const ShoppingList = () => {
       setSelectedProduct(productdetails);
     }
   }, [productdetails]);
-console.log(productList)
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6">
@@ -165,7 +203,6 @@ console.log(productList)
           </div>
         </div>
 
-        {/* PRODUCTS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
           {productList?.map((product) => (
             <ShoppingProductTile
@@ -178,7 +215,6 @@ console.log(productList)
         </div>
       </div>
 
-      {/* PRODUCT DIALOG */}
       <ProductDetailsDialog
         open={openDialog}
         setOpen={(val) => {

@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, resolvePath, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import AuthLayout from "./components/auth/layout";
 import Authlogin from "./pages/auth/login";
@@ -24,6 +24,7 @@ import { checkAuth } from "./store/auth-slice";
 import { Skeleton } from "./components/ui/skeleton";
 import PaypalReturnPage from "./pages/shopping-view/paypal-return";
 import PaymentSuccessPage from "./pages/shopping-view/payment-success";
+import ShoppingSearch from "./pages/shopping-view/search";
 
 
 const App = () => {
@@ -82,6 +83,7 @@ const App = () => {
         <Route path="account" element={<ShoppingAccount />} />
         <Route path="paypal-return" element ={ <PaypalReturnPage />} />
         <Route path="payment-success" element={<PaymentSuccessPage />} />
+        <Route path="search" element={<ShoppingSearch />} />
 
         <Route path="*" element={<NotFound />} />
       </Route>

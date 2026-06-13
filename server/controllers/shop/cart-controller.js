@@ -28,10 +28,24 @@ const addToCart = async (req, res) => {
     const findCurrentProductIndex = userCart.items.findIndex(
       (item) => item.productId.toString() === productId,
     );
+
+    const currentQuantity =
+      findCurrentProductIndex === -1
+        ? 0
+        : Number(userCart.items[findCurrentProductIndex].quantity) || 0;
+    const nextQuantity = currentQuantity + Number(quantity);
+
+    if (nextQuantity > Number(foundProduct.totalStock)) {
+      return res.status(400).json({
+        success: false,
+        message: `Only ${foundProduct.totalStock} items left in stock`,
+      });
+    }
+
     if (findCurrentProductIndex === -1) {
       userCart.items.push({ productId, quantity });
     } else {
-      userCart.items[findCurrentProductIndex].quantity += quantity;
+      userCart.items[findCurrentProductIndex].quantity = nextQuantity;
     }
     await userCart.save();
     res.status(200).json({
@@ -58,7 +72,7 @@ const fetchCartItems = async (req, res) => {
     }
     const cart = await Cart.findOne({ userId }).populate({
       path: "items.productId",
-      select: "image title price salePrice",
+      select: "image title price salePrice totalStock",
     });
     if (!cart) {
       return res.status(404).json({
@@ -80,6 +94,7 @@ const fetchCartItems = async (req, res) => {
       title: item.productId.title,
       price: item.productId.price,
       salePrice: item.productId.salePrice,
+      totalStock: item.productId.totalStock,
       quantity: item.quantity,
     }));
     res.status(200).json({
@@ -122,11 +137,27 @@ const updateCartItemQuantity = async (req, res) => {
         message: "Product not found in cart",
       });
     }
+
+    const foundProduct = await product.findById(productId);
+    if (!foundProduct) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    if (Number(quantity) > Number(foundProduct.totalStock)) {
+      return res.status(400).json({
+        success: false,
+        message: `Only ${foundProduct.totalStock} items left in stock`,
+      });
+    }
+
     userCart.items[findCurrentProductIndex].quantity = quantity;
     await userCart.save();
     await userCart.populate({
       path: "items.productId",
-      select: " image title price salePrice ",
+      select: "image title price salePrice totalStock",
     });
 
     const populateCartItems = userCart.items.map((item) => ({
@@ -135,6 +166,7 @@ const updateCartItemQuantity = async (req, res) => {
       title: item.productId ? item.productId.title : null,
       price: item.productId ? item.productId.price : null,
       salePrice: item.productId ? item.productId.salePrice : null,
+      totalStock: item.productId ? item.productId.totalStock : null,
       quantity: item.quantity,
     }));
     res.status(200).json({
@@ -163,7 +195,7 @@ const deleteCartItem = async (req, res) => {
     }
     const userCart = await Cart.findOne({ userId }).populate({
       path: "items.productId",
-      select: " image title price salePrice ",
+      select: "image title price salePrice totalStock",
     });
     if (!userCart) {
       return res.status(404).json({
@@ -177,7 +209,7 @@ const deleteCartItem = async (req, res) => {
     await userCart.save();
     await userCart.populate({
       path: "items.productId",
-      select: " image title price salePrice ",
+      select: "image title price salePrice totalStock",
     });
 
     const populateCartItems = userCart.items.map((item) => ({
@@ -186,6 +218,7 @@ const deleteCartItem = async (req, res) => {
       title: item.productId ? item.productId.title : null,
       price: item.productId ? item.productId.price : null,
       salePrice: item.productId ? item.productId.salePrice : null,
+      totalStock: item.productId ? item.productId.totalStock : null,
       quantity: item.quantity,
     }));
     res.status(200).json({
