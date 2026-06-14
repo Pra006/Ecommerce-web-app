@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Dialog, DialogContent } from "../../components/ui/dialog";
 import { Button } from "../../components/ui/button";
 import { Separator } from "../ui/separator";
@@ -6,13 +6,61 @@ import { Avatar, AvatarFallback } from "../ui/avatar";
 import { StarIcon } from "lucide-react";
 import { Input } from "../ui/input";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart, fetchCartItems, updateCartItemQuantity } from "../../store/shop/cart-slice";
+import {
+  addToCart,
+  fetchCartItems,
+  updateCartItemQuantity,
+} from "../../store/shop/cart-slice";
 import { toast } from "sonner";
+import StarRating from "../common/Star-rating";
+import { Label } from "../ui/label";
+import { addReview, getReview } from "../../store/shop/review-slice";
+import { useEffect } from "react";
 
 const ProductDetailsDialog = ({ open, setOpen, productdetails }) => {
   const dispatch = useDispatch();
   const { cartItems } = useSelector((state) => state.shopCart);
   const { user } = useSelector((state) => state.auth);
+  const [reviewMsg, setReviewMsg] = useState("");
+  const [rating, setRating] = useState(0);
+  const { reviews} = useSelector((state) => state.shopReview);
+
+
+  const handleRatingChange = (rating) => {
+    setRating(rating);
+  };
+
+  const handleAddReview = () => {
+    if (!rating) {
+      toast.error("Please select a rating");
+      return;
+    }
+
+    dispatch(
+      addReview({
+        productId: productdetails?._id,
+        userId: user?.id || user?._id || user?.Id,
+        userName: user?.userName,
+        reviewMessage: reviewMsg,
+        reviewValue: rating,
+      })).then((data) => {
+        if (data?.payload?.success) {
+          dispatch(getReview(productdetails?._id))
+          toast.success("Review added successfully");
+          setReviewMsg("");
+          setRating(0);
+        } else {
+          toast.error(data?.payload?.message || "Failed to add review");
+        }
+      })
+  };
+
+  useEffect(()=> {
+    if(productdetails !== null){
+      dispatch(getReview(productdetails?._id))
+    }
+  }, [productdetails])  
+  console.log("reviews", reviews)  
 
   function handleAddtoCart(getCurrentProductid, getTotalStock) {
     const userId = user?.id || user?._id || user?.Id;
@@ -168,16 +216,32 @@ const ProductDetailsDialog = ({ open, setOpen, productdetails }) => {
               </div>
             </div>
 
-            {/* Sticky/Bottom Write Review Form */}
-            <div className="flex gap-2 items-center pt-2 border-t mt-auto">
-              <Input placeholder="Write a review..." className="flex-1" />
-              <Button size="sm">Submit</Button>
+            <div className="mt-10 border rounded-lg p-4 space-y-4">
+              <Label className="text-base font-semibold">Write a Review</Label>
+
+              <StarRating
+                rating={rating}
+                handleRatingChange={handleRatingChange}
+              />
+
+              <div className="flex items-center gap-2">
+                <Input
+                  name="reviewMsg"
+                  value={reviewMsg}
+                  onChange={(e) => setReviewMsg(e.target.value)}
+                  placeholder="Share your experience with this product..."
+                  className="flex-1"
+                />
+                <Button onClick={handleAddReview} disabled={!reviewMsg.trim()}>
+                  Submit
+                </Button>
+              </div>
             </div>
           </div>
         </div>
       </DialogContent>
     </Dialog>
   );
-}
+};
 
 export default ProductDetailsDialog;

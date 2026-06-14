@@ -8,7 +8,8 @@ category: String,
 brand:String,
 price:Number,
 salePrice:Number,
-totalStock:Number
+totalStock:Number,
+averageReview:Number
 },{timestamps: true})
 
 const Product = mongoose.model("Product", ProductSchema)
