@@ -8,6 +8,7 @@ const AddressCard = ({
   handleDeleteAddress,
   handleEditAddress,
   setCurrentSelectedAddress,
+  selectedId
 }) => {
   return (
     <Card
@@ -18,7 +19,7 @@ const AddressCard = ({
       }
       className="cursor-pointer hover:bg-gray-100"
     >
-      <CardContent className="space-y-2 p-4">
+      <CardContent className={`${selectedId === addressInfo._id ? "bg-gray-100" : ""}space-y-2 p-4`}>
         <Label>Address :{addressInfo?.address}</Label>
         <Label>City :{addressInfo?.city}</Label>
         <Label>Pincode:{addressInfo?.pincode}</Label>

@@ -88,6 +88,7 @@ const HeaderRightContent = ({ user }) => {
           className="relative rounded-full"
         >
           <ShoppingCart className="h-5 w-5" />
+          <span className="absolute top-[-5px] right-[-2px] font-medium text-sm">{cartItems?.length || 0}</span>
           <span className="sr-only">User cart</span>
         </Button>
         <UserCartWrapper

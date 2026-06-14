@@ -8,10 +8,12 @@ import { Button } from "../../components/ui/button";
 import { useDispatch } from "react-redux";
 import { createNewOrder } from "../../store/shop/order-slice";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
-const ShoppingCheckout = () => {
+const ShoppingCheckout = (selectedId) => {
   const { cartItems, cartId } = useSelector((state) => state.shopCart);
   const [currentSelectedAddress, setCurrentSelectedAddress] = useState(null);
+  const [isPaymentStart, setIsPaymentStart] = useState(false);
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const userId = user?.id ?? user?._id ?? user?.Id ?? user?.ID;
@@ -22,12 +24,14 @@ const ShoppingCheckout = () => {
   }, 0);
 
   const handleInitiatePaypalPayment = () => {
-    if(cartItems.length === 0){
-      toast.error("Your cart is empty. Please add items to your cart before proceeding to payment.");
+    if (cartItems.length === 0) {
+      toast.error(
+        "Your cart is empty. Please add items to your cart before proceeding to payment.",
+      );
       return;
     }
 
-    if(currentSelectedAddress === null){
+    if (currentSelectedAddress === null) {
       toast.error("Please select an address before proceeding to payment.");
       return;
     }
@@ -40,6 +44,7 @@ const ShoppingCheckout = () => {
       console.error("Cannot create order: no address selected");
       return;
     }
+    setIsPaymentStart(true);
 
     const orderData = {
       userId,
@@ -62,10 +67,10 @@ const ShoppingCheckout = () => {
       payerId: "",
     };
     dispatch(createNewOrder(orderData)).then((data) => {
-     if(data?.payload?.approvalURL){
-      window.location.href = data?.payload?.approvalURL;
-     }
-    })
+      if (data?.payload?.approvalURL) {
+        window.location.href = data?.payload?.approvalURL;
+      }
+    });
   };
 
   return (
@@ -79,6 +84,7 @@ const ShoppingCheckout = () => {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5 p-5">
         <Address
+          selectedId={currentSelectedAddress?._id}
           currentSelectedAddress={currentSelectedAddress}
           setCurrentSelectedAddress={setCurrentSelectedAddress}
         />
@@ -97,8 +103,19 @@ const ShoppingCheckout = () => {
             <span>${cartTotal.toFixed(2)}</span>
           </div>
           <div className="mt-4 w-full">
-            <Button onClick={handleInitiatePaypalPayment} className="w-full">
-              Checkout with Paypal
+            <Button
+              onClick={handleInitiatePaypalPayment}
+              className="w-full"
+              disabled={isPaymentStart}
+            >
+              {isPaymentStart ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                "Checkout with PayPal"
+              )}
             </Button>
           </div>
         </div>

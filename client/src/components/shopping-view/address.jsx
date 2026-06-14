@@ -22,7 +22,7 @@ const initialFormData = {
   notes: "",
 };
 
-const Address = ({ currentSelectedAddress, setCurrentSelectedAddress }) => {
+const Address = ({ currentSelectedAddress, setCurrentSelectedAddress, selectedId }) => {
   const [formData, setFormData] = useState(initialFormData);
   const [currentEditAddressId, setCurrentEditAddressId] = useState(null);
   const { user } = useSelector((state) => state.auth);
@@ -128,6 +128,8 @@ if (addressList && addressList.length >=3) {
         {addressList && addressList.length > 0 ? (
           addressList.map((addressInfo) => (
             <AddressCard
+              selectedId={selectedId}
+              currentSelectedAddress={currentSelectedAddress}
               {...(typeof setCurrentSelectedAddress === "function"
                 ? { setCurrentSelectedAddress }
                 : {})}
