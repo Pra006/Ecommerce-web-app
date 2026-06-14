@@ -60,7 +60,6 @@ const ProductDetailsDialog = ({ open, setOpen, productdetails }) => {
       dispatch(getReview(productdetails?._id));
     }
   }, [productdetails]);
-  console.log("reviews", reviews);
 
   function handleAddtoCart(getCurrentProductid, getTotalStock) {
     const userId = user?.id || user?._id || user?.Id;
@@ -120,7 +119,6 @@ const ProductDetailsDialog = ({ open, setOpen, productdetails }) => {
       ? reviews.reduce((sum, review) => sum + review.reviewValue, 0) /
         reviews.length
       : 0;
-  console.log("Average Rating:", averageReview);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

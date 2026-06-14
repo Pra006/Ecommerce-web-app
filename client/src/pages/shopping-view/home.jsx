@@ -1,7 +1,5 @@
 import React from "react";
-import banner1 from "../../assets/banner1.jpg";
-import banner2 from "../../assets/banner2.jpg";
-import banner3 from "../../assets/banner3.jpg";
+
 import { Button } from "../../components/ui/button";
 import {
   ChevronLeftIcon,
@@ -15,12 +13,17 @@ import {
 import { Card, CardContent } from "../../components/ui/card";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllFilteredProducts, fetchProductDetails, clearProductDetails } from "../../store/shop/product-slice";
+import {
+  fetchAllFilteredProducts,
+  fetchProductDetails,
+  clearProductDetails,
+} from "../../store/shop/product-slice";
 import ShoppingProductTile from "../../components/shopping-view/product-tile";
 import { useNavigate } from "react-router-dom";
 import { toast } from "../../components/ui/index";
 import { addToCart, fetchCartItems } from "../../store/shop/cart-slice";
 import ProductDetailsDialog from "../../components/shopping-view/prdouct-details";
+import { getFeatureImage } from "../../store/common-slice/index.js";
 
 const categories = [
   { id: "men", label: "Men", icon: Shirt },
@@ -39,22 +42,36 @@ const brandOptions = [
 ];
 
 const ShoppingHome = () => {
-  const slides = [banner1, banner2, banner3];
+  
   const [currentSlide, setCurrentSlide] = useState(0);
   const dispatch = useDispatch();
   const { productList, productdetails } = useSelector(
     (state) => state.shopProducts,
   );
+  const { featureImageList } = useSelector((state) => state.commonFeature);
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
   const userId = user?.id || user?._id || user?.Id;
   const [openDialog, setOpenDialog] = useState(false);
-    const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
+  const slides = featureImageList?.filter((i) => i?.image) || [];
+
+  const normalizeImageUrl = (url) => {
+    if (!url) return url;
+    return url.replace(/^http:\/\//i, "https://");
+  };
 
   useEffect(() => {
+    console.log("FeatureImageList (raw):", featureImageList);
+    slides.forEach((s) => console.log("raw:", s.image, "normalized:", normalizeImageUrl(s.image)));
+  }, [featureImageList]);
+
+  useEffect(() => {
+    if (!slides.length) return;
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
-    }, 5000);
+    }, 3000);
 
     return () => clearInterval(timer);
   }, [slides.length]);
@@ -103,14 +120,18 @@ const ShoppingHome = () => {
     }
   }
 
+  useEffect(() => {
+    dispatch(getFeatureImage());
+  }, [dispatch]);
+
   return (
     <div className=" flex flex-col min-h-screen">
       <div className="relative w-full h-[600px] overflow-hidden">
         {slides.map((slide, index) => (
           <img
-            src={slide}
-            key={index}
-            alt={`Banner ${index + 1}`}
+            key={slide._id}
+            src={normalizeImageUrl(slide.image)}
+            alt={`Feature ${index + 1}`}
             className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 ${index === currentSlide ? "opacity-100" : "opacity-0"}`}
           />
         ))}
