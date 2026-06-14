@@ -24,6 +24,7 @@ import { toast } from "../../components/ui/index";
 import { addToCart, fetchCartItems } from "../../store/shop/cart-slice";
 import ProductDetailsDialog from "../../components/shopping-view/prdouct-details";
 import { getFeatureImage } from "../../store/common-slice/index.js";
+import Testimonial from "../../components/shopping-view/testimonial";
 
 const categories = [
   { id: "men", label: "Men", icon: Shirt },
@@ -125,8 +126,8 @@ const ShoppingHome = () => {
   }, [dispatch]);
 
   return (
-    <div className=" flex flex-col min-h-screen">
-      <div className="relative w-full h-[600px] overflow-hidden">
+    <div className="flex flex-col min-h-screen">
+      <div className="relative w-full h-48 sm:h-64 md:h-80 lg:h-96 xl:h-[600px] overflow-hidden">
         {slides.map((slide, index) => (
           <img
             key={slide._id}
@@ -144,7 +145,7 @@ const ShoppingHome = () => {
           }}
           variant="outline"
           size="icon"
-          className="absolute top-1/2 left-4 z-10 transform -translate-y-1/2"
+          className="absolute top-1/2 left-2 sm:left-4 z-10 transform -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10"
           aria-label="Previous slide"
         >
           <ChevronLeftIcon className="w-4 h-4" />
@@ -158,27 +159,27 @@ const ShoppingHome = () => {
           }}
           variant="outline"
           size="icon"
-          className="absolute top-1/2 right-4 z-10 transform -translate-y-1/2"
+          className="absolute top-1/2 right-2 sm:right-4 z-10 transform -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10"
           aria-label="Next slide"
         >
           <ChevronRightIcon className="w-4 h-4" />
         </Button>
       </div>
-      <section className="py-12 bg-gray-100">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-semibold text-center">
+      <section className="py-8 sm:py-12 bg-gray-100">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-center mb-6 sm:mb-8">
             Shop by Category
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-6 mt-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-6">
             {categories.map((category) => (
               <Card
                 onClick={() => handleCategoryClick(category, "category")}
                 key={category.id}
                 className="cursor-pointer hover:shadow-lg transition-shadow"
               >
-                <CardContent className="flex flex-col items-center justify-center p-6">
-                  <category.icon className="w-12 text-primary h-12 mb-4" />
-                  <span className="font-bold ">{category.label}</span>
+                <CardContent className="flex flex-col items-center justify-center p-3 sm:p-4 md:p-6">
+                  <category.icon className="w-8 sm:w-10 md:w-12 text-primary h-8 sm:h-10 md:h-12 mb-2 sm:mb-3 md:mb-4" />
+                  <span className="font-bold text-xs sm:text-sm md:text-base text-center">{category.label}</span>
                 </CardContent>
               </Card>
             ))}
@@ -186,18 +187,18 @@ const ShoppingHome = () => {
         </div>
       </section>
 
-      <section className="py-12 bg-gray-100">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-semibold text-center">Shop by Brand</h2>
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-6 mt-8">
+      <section className="py-8 sm:py-12 bg-gray-100">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-center mb-6 sm:mb-8">Shop by Brand</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-6">
             {brandOptions.map((brand) => (
               <Card
                 key={brand.id}
                 className="cursor-pointer hover:shadow-lg transition-shadow"
               >
-                <CardContent className="flex flex-col items-center justify-center p-6">
-                  <brand.icon className="w-12 text-primary h-12 mb-4" />
-                  <span className="font-bold ">{brand.label}</span>
+                <CardContent className="flex flex-col items-center justify-center p-3 sm:p-4 md:p-6">
+                  <brand.icon className="w-8 sm:w-10 md:w-12 text-primary h-8 sm:h-10 md:h-12 mb-2 sm:mb-3 md:mb-4" />
+                  <span className="font-bold text-xs sm:text-sm md:text-base text-center">{brand.label}</span>
                 </CardContent>
               </Card>
             ))}
@@ -205,12 +206,12 @@ const ShoppingHome = () => {
         </div>
       </section>
 
-      <section className="py-6">
-        <div className="container mx-auto px-4 ">
-          <h2 className="text-3xl font-semibold text-center mb-12">
+      <section className="py-8 sm:py-12 md:py-16">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-center mb-8 sm:mb-12">
             Featured Products
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 sm:grid-cols-2 lg:grid-cols-5 px-8 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 md:gap-8">
             {productList && productList.length > 0
               ? productList.map((product) => (
                   <ShoppingProductTile
@@ -224,6 +225,7 @@ const ShoppingHome = () => {
           </div>
         </div>
       </section>
+      <Testimonial />
       <ProductDetailsDialog
         open={openDialog}
         setOpen={(val) => {

@@ -1,5 +1,10 @@
 import React from "react";
-import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import {
   HousePlug,
   Menu,
@@ -29,22 +34,23 @@ import { useState, useEffect } from "react";
 import { fetchCartItems } from "../../store/shop/cart-slice";
 import { Label } from "../ui/label";
 
-
 const MenuItem = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams();
 
   function handleNavigate(getCurrentItem) {
     sessionStorage.removeItem("filters");
     const currentfilters =
-      getCurrentItem.id !== "home" && getCurrentItem.id !== "products" && getCurrentItem.id !== "search"
+      getCurrentItem.id !== "home" &&
+      getCurrentItem.id !== "products" &&
+      getCurrentItem.id !== "search"
         ? { category: [getCurrentItem.id] }
         : {};
     sessionStorage.setItem("filters", JSON.stringify(currentfilters));
-    location.pathname.includes('listing') && currentfilters !== null ?
-    setSearchParams(new URLSearchParams(`?category=${getCurrentItem.id}`)):
-    navigate(getCurrentItem.path);
+    location.pathname.includes("listing") && currentfilters !== null
+      ? setSearchParams(new URLSearchParams(`?category=${getCurrentItem.id}`))
+      : navigate(getCurrentItem.path);
   }
 
   return (
@@ -88,7 +94,9 @@ const HeaderRightContent = ({ user }) => {
           className="relative rounded-full"
         >
           <ShoppingCart className="h-5 w-5" />
-          <span className="absolute top-[-5px] right-[-2px] font-medium text-sm">{cartItems?.length || 0}</span>
+          <span className="absolute top-[-5px] right-[-2px] font-medium text-sm">
+            {cartItems?.length || 0}
+          </span>
           <span className="sr-only">User cart</span>
         </Button>
         <UserCartWrapper
@@ -151,7 +159,6 @@ const ShoppingHeader = () => {
           <span className="text-lg font-bold">Ecommerce</span>
         </Link>
 
-        {/* Mobile Menu */}
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="outline" size="icon" className="lg:hidden">
@@ -169,8 +176,6 @@ const ShoppingHeader = () => {
             <MenuItem />
           </SheetContent>
         </Sheet>
-
-        {/* Desktop Menu */}
         <div className="hidden flex-1 items-center justify-between lg:flex">
           <div className="flex justify-center flex-1">
             <MenuItem />
