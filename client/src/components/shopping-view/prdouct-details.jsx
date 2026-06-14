@@ -23,8 +23,7 @@ const ProductDetailsDialog = ({ open, setOpen, productdetails }) => {
   const { user } = useSelector((state) => state.auth);
   const [reviewMsg, setReviewMsg] = useState("");
   const [rating, setRating] = useState(0);
-  const { reviews} = useSelector((state) => state.shopReview);
-
+  const { reviews } = useSelector((state) => state.shopReview);
 
   const handleRatingChange = (rating) => {
     setRating(rating);
@@ -43,24 +42,25 @@ const ProductDetailsDialog = ({ open, setOpen, productdetails }) => {
         userName: user?.userName,
         reviewMessage: reviewMsg,
         reviewValue: rating,
-      })).then((data) => {
-        if (data?.payload?.success) {
-          dispatch(getReview(productdetails?._id))
-          toast.success("Review added successfully");
-          setReviewMsg("");
-          setRating(0);
-        } else {
-          toast.error(data?.payload?.message || "Failed to add review");
-        }
-      })
+      }),
+    ).then((data) => {
+      if (data?.payload?.success) {
+        dispatch(getReview(productdetails?._id));
+        toast.success("Review added successfully");
+        setReviewMsg("");
+        setRating(0);
+      } else {
+        toast.error(data?.payload?.message || "Failed to add review");
+      }
+    });
   };
 
-  useEffect(()=> {
-    if(productdetails !== null){
-      dispatch(getReview(productdetails?._id))
+  useEffect(() => {
+    if (productdetails !== null) {
+      dispatch(getReview(productdetails?._id));
     }
-  }, [productdetails])  
-  console.log("reviews", reviews)  
+  }, [productdetails]);
+  console.log("reviews", reviews);
 
   function handleAddtoCart(getCurrentProductid, getTotalStock) {
     const userId = user?.id || user?._id || user?.Id;
@@ -115,6 +115,12 @@ const ProductDetailsDialog = ({ open, setOpen, productdetails }) => {
       }
     });
   }
+  const averageReview =
+    reviews && reviews.length > 0
+      ? reviews.reduce((sum, review) => sum + review.reviewValue, 0) /
+        reviews.length
+      : 0;
+  console.log("Average Rating:", averageReview);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -153,14 +159,13 @@ const ProductDetailsDialog = ({ open, setOpen, productdetails }) => {
                 </span>
               )}
             </div>
-
-            <div className="flex items-center gap-0.5 mt-2">
-              {[...Array(5)].map((_, i) => (
-                <StarIcon
-                  key={i}
-                  className="w-5 h-5 fill-amber-400 text-amber-400"
-                />
-              ))}
+            <div className="flex items-center gap-2 mt-4">
+              <div className="flex items-center gap-0.5 mt-2">
+                <StarRating rating={averageReview} />
+              </div>
+              <span className="text-sm text-muted-foreground mt-3">
+                ({averageReview.toFixed(1)})
+              </span>
             </div>
 
             <div className="mt-6">
@@ -190,33 +195,42 @@ const ProductDetailsDialog = ({ open, setOpen, productdetails }) => {
           <div className="flex flex-col flex-1 min-h-[250px] max-h-[350px]">
             <h2 className="text-lg font-bold mb-3">Reviews</h2>
 
-            {/* Scrollable Container for Reviews list */}
             <div className="flex-1 overflow-y-auto space-y-4 pr-1 mb-4">
-              {/* Review Item */}
-              <div className="flex gap-3 items-start bg-muted/30 p-3 rounded-lg">
-                <Avatar className="w-9 h-9 border">
-                  <AvatarFallback>SM</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 space-y-1">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-sm">Prakash Kushwaha</h3>
-                    <div className="flex items-center gap-0.5">
-                      {[...Array(5)].map((_, i) => (
-                        <StarIcon
-                          key={i}
-                          className="w-3.5 h-3.5 fill-amber-400 text-amber-400"
-                        />
-                      ))}
+              {reviews && reviews.length > 0 ? (
+                reviews.map((review) => (
+                  <div
+                    key={review._id}
+                    className="flex gap-3 items-start bg-muted/30 p-3 rounded-lg"
+                  >
+                    <Avatar>
+                      <AvatarFallback>
+                        {review?.userName?.charAt(0)?.toUpperCase() || "A"}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold text-sm">
+                          {review?.userName || "Anonymous"}
+                        </h3>
+
+                        <StarRating rating={review?.reviewValue} />
+                      </div>
+
+                      <p className="text-sm text-muted-foreground mt-2">
+                        {review?.reviewMessage || "No review message"}
+                      </p>
                     </div>
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    This is an awesome Product
-                  </p>
-                </div>
-              </div>
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  No reviews yet
+                </p>
+              )}
             </div>
 
-            <div className="mt-10 border rounded-lg p-4 space-y-4">
+            <div className="mt-4 border rounded-lg p-4 space-y-4">
               <Label className="text-base font-semibold">Write a Review</Label>
 
               <StarRating
